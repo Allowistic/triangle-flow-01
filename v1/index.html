@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Triangle Flow 01 • Allowistic Alcove (v1)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&amp;family=Playfair+Display:wght@700&amp;display=swap');
+    
+    body {
+      margin: 0;
+      background: #0a0514;
+      color: #e8e0f0;
+      font-family: 'Inter', system_ui, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 5, 20, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      border-bottom: 1px solid rgba(64, 224, 208, 0.1);
+    }
+    
+    .brand {
+      color: #40e0d0;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    
+    .main {
+      padding-top: 70px;
+    }
+    
+    .hero {
+      text-align: center;
+      padding: 50px 20px 30px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    
+    .title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.5rem, 7vw, 3.8rem);
+      background: linear-gradient(90deg, #40e0d0, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      color: #b8a8d0;
+      font-size: 1.05rem;
+    }
+    
+    .canvas-container {
+      max-width: 980px;
+      margin: 0 auto 50px;
+      padding: 0 20px;
+    }
+    
+    canvas {
+      border-radius: 16px;
+      box-shadow: 0 25px 60px -15px rgba(0,0,0,0.6);
+      display: block;
+      width: 100% !important;
+    }
+    
+    .instructions {
+      text-align: center;
+      max-width: 520px;
+      margin: 0 auto 70px;
+      padding: 0 20px;
+      color: #c8b8e0;
+      font-size: 0.95rem;
+    }
+    
+    .description {
+      max-width: 600px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+      text-align: center;
+      color: #d4c8e8;
+      font-size: 1.02rem;
+    }
+    
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #8a7aa0;
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(64, 224, 208, 0.08);
+    }
+    
+    .footer a { color: #40e0d0; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div>
+      <span class="brand">Allowistic Alcove</span>
+      <span style="font-size:11px; color:#a090c0; margin-left:8px;">v1 — Original</span>
+    </div>
+    <div style="font-size:13px; color:#a090c0;">Vincent Strader</div>
+  </header>
+
+  <main class="main">
+    <div class="hero">
+      <h1 class="title">Triangle Flow 01</h1>
+      <p class="subtitle">An interactive computational artwork exploring gentle flow and presence.</p>
+    </div>
+
+    <div class="canvas-container">
+      <div id="canvas-wrapper"></div>
+    </div>
+
+    <div class="instructions">
+      <p><strong>Move</strong> your mouse or finger across the canvas.<br>
+      Triangles respond with gentle repulsion and organic return.<br>
+      <strong>Tap or click</strong> anywhere to energize the flow.</p>
+    </div>
+
+    <div class="description">
+      <p>A living field of overlapping triangles. Outer edges glow from vivid red into deep plum. 
+      Bodies shift through turquoise into rich purple. Delicate inner triangles catch and hold light.</p>
+      
+      <p>Created in p5.js as part of ongoing explorations in computational aesthetics and the art of allowing.</p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>Part of the Allowistic Alcove series • <a href="https://allowistic.github.io/triangle-flow-01/">Return to current version (v2)</a></p>
+    <p style="margin-top: 30px;">Vincent Strader • @allowistic • Strader Life Ranch</p>
+  </footer>
+
+  <script>
+    // ========== TRIANGLE FLOW 01 — v1 (Original Touch Reactive Version) ==========
+    let triangles = [];
+    let numTriangles = 11;
+    let globalPhase = 0;
+    let mouseInfluence = 1.1;
+    let returnStrength = 0.018;
+    let interactionRadius = 260;
+
+    function setup() {
+      let canvas = createCanvas(900, 900);
+      canvas.parent('canvas-wrapper');
+      colorMode(RGB, 255, 255, 255, 255);
+      
+      for (let i = 0; i < numTriangles; i++) {
+        let homeX = random(width * 0.18, width * 0.82);
+        let homeY = random(height * 0.18, height * 0.82);
+        
+        triangles.push({
+          x: homeX, y: homeY,
+          homeX: homeX, homeY: homeY,
+          size: random(125, 285),
+          rot: random(TWO_PI),
+          rotSpeed: random(-0.0026, 0.0026),
+          phase: random(TWO_PI),
+          colorMix: random(0.22, 0.78),
+          glowMix: random(0.12, 0.58)
+        });
+      }
+    }
+
+    function draw() {
+      background(10, 5, 20);
+      globalPhase += 0.0072;
+      
+      let mx = mouseX;
+      let my = mouseY;
+      
+      for (let t of triangles) {
+        let dx = t.x - mx;
+        let dy = t.y - my;
+        let d = sqrt(dx * dx + dy * dy);
+        
+        if (d < interactionRadius && d > 8) {
+          let force = (interactionRadius - d) / interactionRadius;
+          force = force * force * mouseInfluence;
+          t.x += (dx / d) * force * 4.2;
+          t.y += (dy / d) * force * 4.2;
+          t.rotSpeed += (force * 0.0008) * (dx > 0 ? 1 : -1);
+        }
+        
+        t.x = lerp(t.x, t.homeX, returnStrength);
+        t.y = lerp(t.y, t.homeY, returnStrength);
+        t.rotSpeed = lerp(t.rotSpeed, map(t.size, 125, 285, -0.0026, 0.0026), 0.035);
+        
+        let wobbleX = sin(frameCount * 0.011 + t.phase) * 14;
+        let wobbleY = cos(frameCount * 0.008 + t.phase * 1.25) * 11;
+        let breath = 1 + sin(frameCount * 0.013 + t.phase) * 0.032;
+        
+        push();
+        translate(t.x + wobbleX, t.y + wobbleY);
+        rotate(t.rot + sin(frameCount * 0.009 + t.phase) * 0.2);
+        
+        let s = t.size * breath;
+        
+        // Blue drop shadow
+        for (let sh = 0; sh < 3; sh++) {
+          push();
+          translate(11 + sh * 5, 15 + sh * 4);
+          fill(35, 95, 210, 48 - sh * 13);
+          noStroke();
+          drawTriangle(s * 1.035);
+          pop();
+        }
+        
+        // Outer glow
+        let redCol = color(255, 55, 55);
+        let plumCol = color(165, 35, 105);
+        for (let g = 0; g < 7; g++) {
+          let amt = g / 6;
+          let glowColor = lerpColor(redCol, plumCol, amt * t.glowMix + 0.08);
+          glowColor.setAlpha(210 - g * 25);
+          stroke(glowColor);
+          strokeWeight(16.5 - g * 2.05);
+          noFill();
+          drawTriangle(s);
+        }
+        
+        // Main fill
+        let turq = color(64, 224, 208);
+        let purp = color(138, 43, 226);
+        let fillCol = lerpColor(turq, purp, t.colorMix + sin(globalPhase * 0.52) * 0.11);
+        fillCol.setAlpha(198);
+        fill(fillCol);
+        stroke(255, 210, 230, 65);
+        strokeWeight(1.1);
+        drawTriangle(s);
+        
+        // Inner glow
+        let innerS = s * 0.59;
+        stroke(85, 255, 235, 155);
+        strokeWeight(2.5);
+        noFill();
+        drawTriangle(innerS);
+        stroke(190, 255, 250, 88);
+        strokeWeight(1.35);
+        drawTriangle(innerS * 0.65);
+        stroke(225, 255, 255, 50);
+        strokeWeight(0.75);
+        drawTriangle(innerS * 0.36);
+        
+        pop();
+        t.rot += t.rotSpeed;
+      }
+    }
+
+    function drawTriangle(s) {
+      let h = s * 0.433;
+      triangle(-s * 0.5, -h, s * 0.5, -h, 0, h * 1.15);
+    }
+
+    function windowResized() {
+      resizeCanvas(900, 900);
+    }
+
+    function mousePressed() {
+      for (let t of triangles) t.rotSpeed *= 2.2;
+    }
+    
+    function touchStarted() {
+      for (let t of triangles) t.rotSpeed *= 1.8;
+      return false;
+    }
+  </script>
+</body>
+</html>
