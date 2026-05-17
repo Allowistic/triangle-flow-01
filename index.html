@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Triangle Flow 01 • Allowistic Alcove</title>
+  <title>Triangle Flow 01 • Allowistic Alcove — v3</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&amp;family=Playfair+Display:wght@700&amp;display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@700&display=swap');
     
     :root {
       --bg: #0a0514;
@@ -180,7 +180,7 @@
   <header class="alcove-header">
     <div style="display: flex; align-items: center;">
       <span class="alcove-brand">Allowistic Alcove</span>
-      <span class="version-badge">v2</span>
+      <span class="version-badge">v3</span>
     </div>
     <div style="font-size: 13px; color: #a090c0;">
       Vincent Strader
@@ -192,7 +192,7 @@
     <!-- Hero -->
     <div class="hero">
       <h1 class="title">Triangle Flow 01</h1>
-      <p class="subtitle">Touch to spawn new triangles.<br>Move to guide the living field.</p>
+      <p class="subtitle">Touch to birth flowing forms.<br>Watch them drift on living currents.</p>
       <p class="artist">by <a href="https://x.com/allowistic" target="_blank">@allowistic</a></p>
     </div>
 
@@ -203,23 +203,22 @@
 
     <!-- Instructions -->
     <div class="instructions">
-      <p><strong>Move</strong> your mouse or finger — triangles gently repel and return.<br>
-      <strong>Touch or click</strong> anywhere to birth small new triangles that float and fade.<br>
-      A living, responsive field in constant gentle becoming.</p>
+      <p><strong>Move</strong> your mouse or finger — large triangles gently repel and return home.<br>
+      <strong>Touch or click</strong> anywhere to spawn small triangles that now drift on organic Perlin flow fields.<br>
+      Touch near a large triangle to trigger recursive subdivision — new child forms are released into the current.</p>
     </div>
 
     <!-- Description -->
     <div class="description">
-      <p>Triangles breathe and drift. Red-to-plum glows pulse at their edges while turquoise melts into purple within. 
-      Delicate inner triangles hold quiet light. Now, every touch brings new life — small triangles spawn, drift upward, 
-      and dissolve back into the field.</p>
+      <p>Large triangles hold steady presence with red-to-plum glowing edges and turquoise-to-purple fills, their inner triangles quietly luminous. Blue shadows give them weight and depth.</p>
       
-      <p>This is an evolving piece. Each iteration deepens the conversation between code, touch, and presence. 
-      The work remains open — never finished, always allowing.</p>
+      <p>Now the field has become more alive: every touch releases small triangles that move according to smooth <strong>Perlin noise flow fields</strong> — organic, wave-like currents rather than mechanical paths. Touching near a main form can trigger <strong>recursive subdivision</strong>, birthing child triangles that join the flowing ecosystem.</p>
+      
+      <p>This is an evolving generative artwork. Structure and randomness dance together. The piece remains open — always allowing new becoming.</p>
       
       <div class="version-note">
-        You are viewing <strong>v2</strong> — with touch-spawned triangles.<br>
-        <a href="/triangle-flow-01/v1/">View v1 (original version)</a> to see where it began.
+        You are viewing <strong>v3</strong> — Perlin flow fields + touch-triggered recursive subdivision.<br>
+        <a href="/triangle-flow-01/v2/">View v2</a> &nbsp;•&nbsp; <a href="/triangle-flow-01/v1/">View v1 (original)</a>
       </div>
     </div>
 
@@ -239,33 +238,39 @@
   </footer>
 
   <script>
-    // ========== ALLOWISTIC TRIANGLES v2 — Touch Reactive + Spawn on Touch ==========
+    // ========== ALLOWISTIC TRIANGLES v3 ==========
+    // Perlin Noise Flow Fields + Recursive Subdivision elements
+    // Large triangles: repulsion + spring return + full glow treatment
+    // Spawned small triangles: now drift on organic Perlin flow fields
+    // Touch near large triangles triggers subdivision bursts (child forms released into the flow)
+
     let triangles = [];
-    let spawned = [];           // small triangles born from touch
-    let numTriangles = 11;
+    let flowing = [];          // small triangles flowing on Perlin field
+    let numTriangles = 10;
     let globalPhase = 0;
-    let mouseInfluence = 1.15;
-    let returnStrength = 0.019;
-    let interactionRadius = 255;
+    let mouseInfluence = 1.12;
+    let returnStrength = 0.018;
+    let interactionRadius = 260;
 
     function setup() {
-      let canvas = createCanvas(900, 900);
+      let canvas = createCanvas(920, 920);
       canvas.parent('canvas-wrapper');
       colorMode(RGB, 255, 255, 255, 255);
+      noiseSeed(42); // consistent but beautiful flow field seed
       
       for (let i = 0; i < numTriangles; i++) {
-        let homeX = random(width * 0.17, width * 0.83);
-        let homeY = random(height * 0.17, height * 0.83);
+        let homeX = random(width * 0.16, width * 0.84);
+        let homeY = random(height * 0.16, height * 0.84);
         
         triangles.push({
           x: homeX, y: homeY,
           homeX: homeX, homeY: homeY,
-          size: random(130, 280),
+          size: random(125, 275),
           rot: random(TWO_PI),
-          rotSpeed: random(-0.0025, 0.0025),
+          rotSpeed: random(-0.0024, 0.0024),
           phase: random(TWO_PI),
-          colorMix: random(0.2, 0.8),
-          glowMix: random(0.1, 0.6)
+          colorMix: random(0.22, 0.78),
+          glowMix: random(0.12, 0.58)
         });
       }
     }
@@ -273,61 +278,61 @@
     function draw() {
       background(10, 5, 20);
       
-      globalPhase += 0.007;
+      globalPhase += 0.0068;
       
       let mx = mouseX;
       let my = mouseY;
       
-      // === MAIN TRIANGLES ===
+      // === LARGE MAIN TRIANGLES ===
       for (let t of triangles) {
-        // Repulsion from mouse/finger
+        // Gentle repulsion from mouse/finger
         let dx = t.x - mx;
         let dy = t.y - my;
         let d = sqrt(dx * dx + dy * dy);
         
-        if (d < interactionRadius && d > 10) {
+        if (d < interactionRadius && d > 12) {
           let force = (interactionRadius - d) / interactionRadius;
           force = force * force * mouseInfluence;
-          t.x += (dx / d) * force * 4.4;
-          t.y += (dy / d) * force * 4.4;
-          t.rotSpeed += force * 0.0007 * (dx > 0 ? 1 : -1);
+          t.x += (dx / d) * force * 4.3;
+          t.y += (dy / d) * force * 4.3;
+          t.rotSpeed += force * 0.00065 * (dx > 0 ? 1 : -1);
         }
         
-        // Spring return to home
+        // Spring return to home position
         t.x = lerp(t.x, t.homeX, returnStrength);
         t.y = lerp(t.y, t.homeY, returnStrength);
-        t.rotSpeed = lerp(t.rotSpeed, map(t.size, 130, 280, -0.0025, 0.0025), 0.032);
+        t.rotSpeed = lerp(t.rotSpeed, map(t.size, 125, 275, -0.0024, 0.0024), 0.03);
         
-        let wobbleX = sin(frameCount * 0.011 + t.phase) * 13;
-        let wobbleY = cos(frameCount * 0.008 + t.phase * 1.2) * 10;
-        let breath = 1 + sin(frameCount * 0.013 + t.phase) * 0.03;
+        let wobbleX = sin(frameCount * 0.0105 + t.phase) * 12;
+        let wobbleY = cos(frameCount * 0.0075 + t.phase * 1.25) * 9;
+        let breath = 1 + sin(frameCount * 0.012 + t.phase) * 0.028;
         
         push();
         translate(t.x + wobbleX, t.y + wobbleY);
-        rotate(t.rot + sin(frameCount * 0.009 + t.phase) * 0.18);
+        rotate(t.rot + sin(frameCount * 0.0085 + t.phase) * 0.17);
         
         let s = t.size * breath;
         
         // Blue drop shadow
         for (let sh = 0; sh < 3; sh++) {
           push();
-          translate(10 + sh * 4.5, 14 + sh * 3.5);
-          fill(35, 95, 210, 45 - sh * 12);
+          translate(11 + sh * 4.5, 15 + sh * 3.8);
+          fill(35, 95, 210, 42 - sh * 11);
           noStroke();
-          drawTriangle(s * 1.03);
+          drawTriangle(s * 1.025);
           pop();
         }
         
         // Outer glow (Red → Deep Plum)
         let redCol = color(255, 55, 55);
-        let plumCol = color(165, 35, 105);
+        let plumCol = color(168, 38, 108);
         
         for (let g = 0; g < 7; g++) {
           let amt = g / 6;
-          let glowColor = lerpColor(redCol, plumCol, amt * t.glowMix + 0.07);
-          glowColor.setAlpha(205 - g * 24);
+          let glowColor = lerpColor(redCol, plumCol, amt * t.glowMix + 0.06);
+          glowColor.setAlpha(208 - g * 23);
           stroke(glowColor);
-          strokeWeight(16 - g * 2);
+          strokeWeight(15.5 - g * 1.95);
           noFill();
           drawTriangle(s);
         }
@@ -335,46 +340,58 @@
         // Main fill (Turquoise → Purple)
         let turq = color(64, 224, 208);
         let purp = color(138, 43, 226);
-        let fillCol = lerpColor(turq, purp, t.colorMix + sin(globalPhase * 0.5) * 0.1);
-        fillCol.setAlpha(195);
+        let fillCol = lerpColor(turq, purp, t.colorMix + sin(globalPhase * 0.48) * 0.09);
+        fillCol.setAlpha(192);
         fill(fillCol);
-        stroke(255, 210, 230, 60);
-        strokeWeight(1.1);
+        stroke(255, 215, 235, 55);
+        strokeWeight(1.0);
         drawTriangle(s);
         
         // Inner glowing triangles
-        let innerS = s * 0.58;
-        stroke(85, 255, 235, 150);
-        strokeWeight(2.4);
+        let innerS = s * 0.57;
+        stroke(88, 255, 238, 148);
+        strokeWeight(2.35);
         noFill();
         drawTriangle(innerS);
         
-        stroke(190, 255, 250, 85);
-        strokeWeight(1.3);
-        drawTriangle(innerS * 0.64);
+        stroke(195, 255, 252, 82);
+        strokeWeight(1.25);
+        drawTriangle(innerS * 0.63);
         
-        stroke(225, 255, 255, 48);
-        strokeWeight(0.7);
-        drawTriangle(innerS * 0.35);
+        stroke(230, 255, 255, 45);
+        strokeWeight(0.65);
+        drawTriangle(innerS * 0.34);
         
         pop();
         
         t.rot += t.rotSpeed;
       }
       
-      // === SPAWNED SMALL TRIANGLES (from touch) ===
-      for (let i = spawned.length - 1; i >= 0; i--) {
-        let p = spawned[i];
+      // === FLOWING SMALL TRIANGLES (Perlin noise flow field) ===
+      for (let i = flowing.length - 1; i >= 0; i--) {
+        let p = flowing[i];
+        
+        // Perlin noise flow field
+        let noiseScale = 0.0058;
+        let n = noise(p.x * noiseScale, p.y * noiseScale, frameCount * 0.011);
+        let angle = map(n, 0, 1, -PI * 1.6, PI * 1.6);
+        
+        let desiredVx = cos(angle) * 1.35;
+        let desiredVy = sin(angle) * 1.35;
+        
+        // Lerp toward desired flow direction (smooth organic movement)
+        p.vx = lerp(p.vx, desiredVx, 0.085);
+        p.vy = lerp(p.vy, desiredVy, 0.085);
         
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.012;           // gentle downward drift
-        p.alpha -= 2.8;          // fade out
-        p.size *= 0.985;         // slowly shrink
+        
+        p.alpha -= 2.6;
+        p.size *= 0.982;
         p.rot += p.rotSpeed;
         
-        if (p.alpha <= 8 || p.size < 6) {
-          spawned.splice(i, 1);
+        if (p.alpha <= 6 || p.size < 5) {
+          flowing.splice(i, 1);
           continue;
         }
         
@@ -382,18 +399,20 @@
         translate(p.x, p.y);
         rotate(p.rot);
         
-        // Soft outer glow for spawned
-        stroke(255, 120, 180, p.alpha * 0.6);
-        strokeWeight(3);
+        // Subtle outer glow for flowing triangles
+        stroke(255, 130, 190, p.alpha * 0.55);
+        strokeWeight(2.8);
         noFill();
         drawTriangle(p.size);
         
-        // Fill
-        let c = lerpColor(color(90, 230, 210), color(160, 90, 230), p.colorMix);
+        // Fill — slightly more purple bias for subdivision children
+        let baseTurq = color(70, 235, 215);
+        let basePurp = color(155, 85, 235);
+        let c = lerpColor(baseTurq, basePurp, p.colorMix);
         c.setAlpha(p.alpha);
         fill(c);
-        stroke(255, 255, 255, p.alpha * 0.35);
-        strokeWeight(0.8);
+        stroke(255, 255, 255, p.alpha * 0.32);
+        strokeWeight(0.7);
         drawTriangle(p.size);
         
         pop();
@@ -410,42 +429,72 @@
     }
 
     function windowResized() {
-      resizeCanvas(900, 900);
+      resizeCanvas(920, 920);
     }
 
-    // === SPAWN SMALL TRIANGLES ON TOUCH / CLICK ===
+    // Spawn normal flowing triangles + check for subdivision trigger
     function spawnAt(x, y) {
-      let count = floor(random(7, 13));
+      // Normal spawn burst
+      let count = floor(random(8, 14));
       for (let i = 0; i < count; i++) {
-        spawned.push({
-          x: x + random(-18, 18),
-          y: y + random(-18, 18),
-          vx: random(-1.8, 1.8),
-          vy: random(-2.8, -0.6),
-          size: random(18, 38),
+        flowing.push({
+          x: x + random(-22, 22),
+          y: y + random(-22, 22),
+          vx: random(-1.6, 1.6),
+          vy: random(-2.2, -0.4),
+          size: random(16, 34),
           rot: random(TWO_PI),
-          rotSpeed: random(-0.08, 0.08),
-          alpha: random(165, 215),
-          colorMix: random(0.15, 0.85)
+          rotSpeed: random(-0.07, 0.07),
+          alpha: random(155, 205),
+          colorMix: random(0.2, 0.75)
         });
+      }
+      
+      // === RECURSIVE SUBDIVISION TRIGGER ===
+      // Find closest main triangle and release child forms if close enough
+      let closest = null;
+      let minDist = 180;
+      
+      for (let t of triangles) {
+        let d = dist(x, y, t.x, t.y);
+        if (d < minDist) {
+          minDist = d;
+          closest = t;
+        }
+      }
+      
+      if (closest) {
+        // Birth 4–6 child triangles from subdivision (they join the flowing system)
+        let subdivCount = floor(random(4, 7));
+        for (let i = 0; i < subdivCount; i++) {
+          let offsetX = random(-28, 28);
+          let offsetY = random(-28, 28);
+          
+          flowing.push({
+            x: closest.x + offsetX,
+            y: closest.y + offsetY,
+            vx: random(-1.2, 1.2) + (offsetX * 0.03),
+            vy: random(-1.8, -0.3) + (offsetY * 0.025),
+            size: random(22, 42),           // slightly larger child forms
+            rot: random(TWO_PI),
+            rotSpeed: random(-0.06, 0.06),
+            alpha: random(145, 195),
+            colorMix: random(0.45, 0.92)     // more purple bias for "children"
+          });
+        }
+        
+        // Give the parent triangle a little energetic pulse
+        closest.rotSpeed *= 2.1;
       }
     }
 
     function mousePressed() {
       spawnAt(mouseX, mouseY);
-      
-      // Also give main triangles a little energy boost
-      for (let t of triangles) {
-        t.rotSpeed *= 1.9;
-      }
     }
 
     function touchStarted() {
       if (touches.length > 0) {
         spawnAt(touches[0].x, touches[0].y);
-      }
-      for (let t of triangles) {
-        t.rotSpeed *= 1.7;
       }
       return false;
     }
