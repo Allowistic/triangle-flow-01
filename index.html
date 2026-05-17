@@ -2,502 +2,486 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Triangle Flow 01 • Allowistic Alcove — v3</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Allowistic Living Idea Tree • Triangle Flow</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@700&display=swap');
-    
-    :root {
-      --bg: #0a0514;
-      --accent: #40e0d0;
-      --purple: #8a2be2;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@500;600&display=swap');
     
     body {
+      margin: 0;
+      padding: 0;
       background: #0a0514;
-      color: #e8e0f0;
+      color: #e0d4ff;
       font-family: 'Inter', system_ui, sans-serif;
-      line-height: 1.6;
       overflow-x: hidden;
     }
     
-    .alcove-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      background: rgba(10, 5, 20, 0.88);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(64, 224, 208, 0.12);
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    .alcove-brand {
-      font-size: 14px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: #40e0d0;
-      font-weight: 500;
-    }
-    
-    .version-badge {
-      font-size: 10px;
-      background: rgba(64, 224, 208, 0.15);
-      color: #40e0d0;
-      padding: 2px 9px;
-      border-radius: 999px;
-      margin-left: 10px;
-      letter-spacing: 1px;
-    }
-    
-    .main {
-      padding-top: 78px;
-    }
-    
-    .hero {
+    .header {
+      padding: 28px 20px 18px;
       text-align: center;
-      padding: 52px 24px 32px;
-      max-width: 720px;
-      margin: 0 auto;
+      border-bottom: 1px solid rgba(255, 235, 59, 0.1);
     }
     
-    .title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: clamp(2.6rem, 7vw, 4rem);
-      line-height: 1.05;
-      margin-bottom: 8px;
-      background: linear-gradient(90deg, #40e0d0, #c084fc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .header h1 {
+      margin: 0 0 6px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.4px;
     }
     
-    .subtitle {
-      font-size: 1.05rem;
-      color: #b8a8d0;
-      max-width: 460px;
-      margin: 0 auto 18px;
+    .header .subtitle {
+      font-size: 13px;
+      opacity: 0.65;
+      margin: 0;
     }
     
-    .artist {
-      font-size: 0.92rem;
-      color: #a090c0;
+    .tree-nav {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      padding: 22px 16px;
+      flex-wrap: wrap;
     }
     
-    .artist a {
-      color: #40e0d0;
-      text-decoration: none;
+    .branch {
+      background: rgba(22, 14, 42, 0.65);
+      border: 1px solid rgba(255, 235, 59, 0.18);
+      border-radius: 14px;
+      padding: 13px 24px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      min-width: 168px;
+      text-align: center;
     }
     
-    .canvas-container {
+    .branch.active {
+      background: rgba(255, 235, 59, 0.09);
+      border-color: #ffeb3b;
+      box-shadow: 0 0 0 1px #ffeb3b;
+    }
+    
+    .branch:hover {
+      transform: translateY(-1px);
+      border-color: #ffeb3b;
+    }
+    
+    .branch-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+    
+    .branch-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 3px;
+      color: #f5e8c7;
+    }
+    
+    .main-content {
       max-width: 1080px;
-      margin: 0 auto 40px;
-      padding: 0 20px;
-      position: relative;
+      margin: 0 auto;
+      padding: 0 16px 50px;
     }
     
-    #defaultCanvas0 {
+    .sketch-container {
+      background: #0f0a1f;
       border-radius: 18px;
-      box-shadow: 0 30px 70px -18px rgba(0, 0, 0, 0.65),
-                  0 0 0 1px rgba(64, 224, 208, 0.1);
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,235,59,0.08);
+      margin-bottom: 26px;
+    }
+    
+    canvas {
       display: block;
       width: 100% !important;
       height: auto !important;
     }
     
+    .poetry {
+      max-width: 620px;
+      margin: 0 auto 34px;
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.65;
+      opacity: 0.82;
+    }
+    
     .instructions {
       text-align: center;
-      max-width: 560px;
-      margin: 0 auto 70px;
-      padding: 0 24px;
-      font-size: 0.95rem;
-      color: #c8b8e0;
-    }
-    
-    .instructions strong {
-      color: #40e0d0;
-    }
-    
-    .description {
-      max-width: 640px;
-      margin: 0 auto 90px;
-      padding: 0 24px;
-      text-align: center;
-      font-size: 1.02rem;
-      color: #d4c8e8;
-    }
-    
-    .description p {
-      margin-bottom: 1.05em;
+      font-size: 13.5px;
+      opacity: 0.65;
+      margin-bottom: 22px;
+      line-height: 1.5;
     }
     
     .version-note {
-      font-size: 0.85rem;
-      color: #8a7aa0;
-      margin-top: 30px;
-    }
-    
-    .version-note a {
-      color: #40e0d0;
-      text-decoration: none;
-    }
-    
-    .footer {
-      border-top: 1px solid rgba(64, 224, 208, 0.08);
-      padding: 48px 24px 60px;
       text-align: center;
-      font-size: 0.9rem;
-      color: #8a7aa0;
+      font-size: 12px;
+      opacity: 0.55;
+      margin-top: 48px;
     }
     
-    .footer a {
-      color: #40e0d0;
-      text-decoration: none;
-    }
-    
-    .philosophy {
-      font-style: italic;
-      color: #a090c0;
-      max-width: 380px;
-      margin: 28px auto 0;
-      font-size: 0.9rem;
-    }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="alcove-header">
-    <div style="display: flex; align-items: center;">
-      <span class="alcove-brand">Allowistic Alcove</span>
-      <span class="version-badge">v3</span>
-    </div>
-    <div style="font-size: 13px; color: #a090c0;">
-      Vincent Strader
-    </div>
-  </header>
+  <div class="header">
+    <h1>Allowistic Living Idea Tree</h1>
+    <p class="subtitle">Ideas as branches • Geometry as breath • Touch as wind</p>
+  </div>
 
-  <main class="main">
-
-    <!-- Hero -->
-    <div class="hero">
-      <h1 class="title">Triangle Flow 01</h1>
-      <p class="subtitle">Touch to birth flowing forms.<br>Watch them drift on living currents.</p>
-      <p class="artist">by <a href="https://x.com/allowistic" target="_blank">@allowistic</a></p>
+  <!-- Tree Navigation -->
+  <div class="tree-nav">
+    <div class="branch active" onclick="switchBranch('trunk')">
+      <div class="branch-label">Main Trunk</div>
+      <div class="branch-title">Triangle Flow v3</div>
     </div>
-
-    <!-- Interactive Canvas -->
-    <div class="canvas-container">
-      <div id="canvas-wrapper"></div>
+    <div class="branch" onclick="switchBranch('sway')">
+      <div class="branch-label">New Branch</div>
+      <div class="branch-title">Fluorescent Sway</div>
     </div>
+  </div>
 
-    <!-- Instructions -->
-    <div class="instructions">
-      <p><strong>Move</strong> your mouse or finger — large triangles gently repel and return home.<br>
-      <strong>Touch or click</strong> anywhere to spawn small triangles that now drift on organic Perlin flow fields.<br>
-      Touch near a large triangle to trigger recursive subdivision — new child forms are released into the current.</p>
-    </div>
+  <div class="main-content">
 
-    <!-- Description -->
-    <div class="description">
-      <p>Large triangles hold steady presence with red-to-plum glowing edges and turquoise-to-purple fills, their inner triangles quietly luminous. Blue shadows give them weight and depth.</p>
-      
-      <p>Now the field has become more alive: every touch releases small triangles that move according to smooth <strong>Perlin noise flow fields</strong> — organic, wave-like currents rather than mechanical paths. Touching near a main form can trigger <strong>recursive subdivision</strong>, birthing child triangles that join the flowing ecosystem.</p>
-      
-      <p>This is an evolving generative artwork. Structure and randomness dance together. The piece remains open — always allowing new becoming.</p>
-      
-      <div class="version-note">
-        You are viewing <strong>v3</strong> — Perlin flow fields + touch-triggered recursive subdivision.<br>
-        <a href="/triangle-flow-01/v2/">View v2</a> &nbsp;•&nbsp; <a href="/triangle-flow-01/v1/">View v1 (original)</a>
+    <p class="poetry">
+      Each idea grows from the same living trunk.<br>
+      Touch is wind. Triangles are vessels. Everything flows and returns.
+    </p>
+
+    <!-- MAIN TRUNK: Triangle Flow v3 -->
+    <div id="trunk-section">
+      <div class="instructions">
+        Move your mouse or finger near the triangles • Tap near a large form to trigger recursive subdivision
+      </div>
+      <div class="sketch-container">
+        <div id="trunk-canvas"></div>
       </div>
     </div>
 
-  </main>
+    <!-- NEW BRANCH: Fluorescent Sway (pure triangles + yellow outlines) -->
+    <div id="sway-section" class="hidden">
+      <div class="instructions">
+        Move your finger or mouse to create wind • Triangles sway, drift, and softly interact • Tap for stronger gusts
+      </div>
+      <div class="sketch-container">
+        <div id="sway-canvas"></div>
+      </div>
+    </div>
 
-  <footer class="footer">
-    <p>Part of the <strong>Allowistic Alcove</strong> series — spaces for creative flow and presence.</p>
+    <div class="version-note">
+      Living Idea Tree • All pieces made with triangles, flow, and presence.<br>
+      <a href="https://allowistic.github.io/triangle-flow-01/v2/" style="color:#ffeb3b; text-decoration:none;">View v2</a> &nbsp;•&nbsp; 
+      <a href="https://allowistic.github.io/triangle-flow-01/v1/" style="color:#ffeb3b; text-decoration:none;">v1 archive</a>
+    </div>
+
+  </div>
+
+<script>
+// ========== BRANCH SWITCHER ==========
+let currentBranch = 'trunk';
+
+function switchBranch(branch) {
+  const trunkSec = document.getElementById('trunk-section');
+  const swaySec = document.getElementById('sway-section');
+  const branches = document.querySelectorAll('.branch');
+  
+  branches.forEach(b => b.classList.remove('active'));
+  
+  if (branch === 'trunk') {
+    trunkSec.classList.remove('hidden');
+    swaySec.classList.add('hidden');
+    branches[0].classList.add('active');
+    currentBranch = 'trunk';
+  } else {
+    trunkSec.classList.add('hidden');
+    swaySec.classList.remove('hidden');
+    branches[1].classList.add('active');
+    currentBranch = 'sway';
+  }
+}
+
+// ========== TRUNK: Triangle Flow v3 ==========
+let trunkTriangles = [];
+let trunkGlobalPhase = 0;
+
+function setupTrunk(p) {
+  for (let i = 0; i < 11; i++) {
+    let hx = p.random(p.width * 0.18, p.width * 0.82);
+    let hy = p.random(p.height * 0.18, p.height * 0.82);
+    trunkTriangles.push({
+      x: hx, y: hy, homeX: hx, homeY: hy,
+      size: p.random(125, 285),
+      rot: p.random(p.TWO_PI),
+      rotSpeed: p.random(-0.0026, 0.0026),
+      phase: p.random(p.TWO_PI),
+      colorMix: p.random(0.22, 0.78),
+      glowMix: p.random(0.12, 0.58)
+    });
+  }
+}
+
+function drawTrunk(p) {
+  p.background(10, 5, 20);
+  trunkGlobalPhase += 0.0072;
+  
+  let mx = p.mouseX;
+  let my = p.mouseY;
+  
+  for (let t of trunkTriangles) {
+    let dx = t.x - mx;
+    let dy = t.y - my;
+    let d = p.sqrt(dx*dx + dy*dy);
     
-    <p class="philosophy">
-      “Creativity flows in the waves of now.”
-    </p>
+    if (d < 260 && d > 8) {
+      let force = ((260 - d) / 260) ** 2 * 1.1;
+      t.x += (dx / d) * force * 4.2;
+      t.y += (dy / d) * force * 4.2;
+      t.rotSpeed += force * 0.0008 * (dx > 0 ? 1 : -1);
+    }
     
-    <p style="margin-top: 38px; font-size: 0.8rem;">
-      Vincent Wilhelm Vaughn Strader • <a href="https://x.com/allowistic" target="_blank">@allowistic</a><br>
-      Strader Life Ranch • Springville, California
-    </p>
-  </footer>
+    t.x = p.lerp(t.x, t.homeX, 0.018);
+    t.y = p.lerp(t.y, t.homeY, 0.018);
+    t.rotSpeed = p.lerp(t.rotSpeed, p.map(t.size, 125, 285, -0.0026, 0.0026), 0.035);
+    
+    let wobbleX = p.sin(p.frameCount * 0.011 + t.phase) * 14;
+    let wobbleY = p.cos(p.frameCount * 0.008 + t.phase * 1.25) * 11;
+    let breath = 1 + p.sin(p.frameCount * 0.013 + t.phase) * 0.032;
+    
+    p.push();
+    p.translate(t.x + wobbleX, t.y + wobbleY);
+    p.rotate(t.rot + p.sin(p.frameCount * 0.009 + t.phase) * 0.2);
+    
+    let s = t.size * breath;
+    
+    // Blue shadow
+    for (let sh = 0; sh < 3; sh++) {
+      p.push();
+      p.translate(11 + sh*5, 15 + sh*4);
+      p.fill(35, 95, 210, 48 - sh*13);
+      p.noStroke();
+      drawTriangle(p, s * 1.035);
+      p.pop();
+    }
+    
+    // Outer glow (red → plum)
+    let redCol = p.color(255, 55, 55);
+    let plumCol = p.color(165, 35, 105);
+    for (let g = 0; g < 7; g++) {
+      let amt = g / 6;
+      let glowColor = p.lerpColor(redCol, plumCol, amt * t.glowMix + 0.08);
+      glowColor.setAlpha(210 - g * 25);
+      p.stroke(glowColor);
+      p.strokeWeight(16.5 - g * 2.05);
+      p.noFill();
+      drawTriangle(p, s);
+    }
+    
+    // Main fill
+    let turq = p.color(64, 224, 208);
+    let purp = p.color(138, 43, 226);
+    let fillCol = p.lerpColor(turq, purp, t.colorMix + p.sin(trunkGlobalPhase * 0.52) * 0.11);
+    fillCol.setAlpha(198);
+    p.fill(fillCol);
+    p.stroke(255, 210, 230, 65);
+    p.strokeWeight(1.1);
+    drawTriangle(p, s);
+    
+    // Inner glowing triangles
+    let innerS = s * 0.59;
+    p.stroke(85, 255, 235, 155);
+    p.strokeWeight(2.5);
+    p.noFill();
+    drawTriangle(p, innerS);
+    p.stroke(190, 255, 250, 88);
+    p.strokeWeight(1.35);
+    drawTriangle(p, innerS * 0.65);
+    
+    p.pop();
+    t.rot += t.rotSpeed;
+  }
+}
 
-  <script>
-    // ========== ALLOWISTIC TRIANGLES v3 ==========
-    // Perlin Noise Flow Fields + Recursive Subdivision elements
-    // Large triangles: repulsion + spring return + full glow treatment
-    // Spawned small triangles: now drift on organic Perlin flow fields
-    // Touch near large triangles triggers subdivision bursts (child forms released into the flow)
-
-    let triangles = [];
-    let flowing = [];          // small triangles flowing on Perlin field
-    let numTriangles = 10;
-    let globalPhase = 0;
-    let mouseInfluence = 1.12;
-    let returnStrength = 0.018;
-    let interactionRadius = 260;
-
-    function setup() {
-      let canvas = createCanvas(920, 920);
-      canvas.parent('canvas-wrapper');
-      colorMode(RGB, 255, 255, 255, 255);
-      noiseSeed(42); // consistent but beautiful flow field seed
-      
-      for (let i = 0; i < numTriangles; i++) {
-        let homeX = random(width * 0.16, width * 0.84);
-        let homeY = random(height * 0.16, height * 0.84);
-        
-        triangles.push({
-          x: homeX, y: homeY,
-          homeX: homeX, homeY: homeY,
-          size: random(125, 275),
-          rot: random(TWO_PI),
-          rotSpeed: random(-0.0024, 0.0024),
-          phase: random(TWO_PI),
-          colorMix: random(0.22, 0.78),
-          glowMix: random(0.12, 0.58)
+function mousePressedTrunk(p) {
+  for (let t of trunkTriangles) {
+    let d = p.dist(p.mouseX, p.mouseY, t.x, t.y);
+    if (d < 180) {
+      for (let i = 0; i < 5; i++) {
+        let angle = p.random(p.TWO_PI);
+        trunkTriangles.push({
+          x: t.x + p.cos(angle) * 40,
+          y: t.y + p.sin(angle) * 40,
+          homeX: t.x + p.cos(angle) * p.random(80, 160),
+          homeY: t.y + p.sin(angle) * p.random(80, 160),
+          size: t.size * p.random(0.25, 0.45),
+          rot: p.random(p.TWO_PI),
+          rotSpeed: p.random(-0.008, 0.008),
+          phase: p.random(p.TWO_PI),
+          colorMix: p.random(0.3, 0.9),
+          glowMix: p.random(0.2, 0.7)
         });
       }
+      t.rotSpeed *= 3.5;
     }
+  }
+}
 
-    function draw() {
-      background(10, 5, 20);
-      
-      globalPhase += 0.0068;
-      
-      let mx = mouseX;
-      let my = mouseY;
-      
-      // === LARGE MAIN TRIANGLES ===
-      for (let t of triangles) {
-        // Gentle repulsion from mouse/finger
-        let dx = t.x - mx;
-        let dy = t.y - my;
-        let d = sqrt(dx * dx + dy * dy);
-        
-        if (d < interactionRadius && d > 12) {
-          let force = (interactionRadius - d) / interactionRadius;
-          force = force * force * mouseInfluence;
-          t.x += (dx / d) * force * 4.3;
-          t.y += (dy / d) * force * 4.3;
-          t.rotSpeed += force * 0.00065 * (dx > 0 ? 1 : -1);
-        }
-        
-        // Spring return to home position
-        t.x = lerp(t.x, t.homeX, returnStrength);
-        t.y = lerp(t.y, t.homeY, returnStrength);
-        t.rotSpeed = lerp(t.rotSpeed, map(t.size, 125, 275, -0.0024, 0.0024), 0.03);
-        
-        let wobbleX = sin(frameCount * 0.0105 + t.phase) * 12;
-        let wobbleY = cos(frameCount * 0.0075 + t.phase * 1.25) * 9;
-        let breath = 1 + sin(frameCount * 0.012 + t.phase) * 0.028;
-        
-        push();
-        translate(t.x + wobbleX, t.y + wobbleY);
-        rotate(t.rot + sin(frameCount * 0.0085 + t.phase) * 0.17);
-        
-        let s = t.size * breath;
-        
-        // Blue drop shadow
-        for (let sh = 0; sh < 3; sh++) {
-          push();
-          translate(11 + sh * 4.5, 15 + sh * 3.8);
-          fill(35, 95, 210, 42 - sh * 11);
-          noStroke();
-          drawTriangle(s * 1.025);
-          pop();
-        }
-        
-        // Outer glow (Red → Deep Plum)
-        let redCol = color(255, 55, 55);
-        let plumCol = color(168, 38, 108);
-        
-        for (let g = 0; g < 7; g++) {
-          let amt = g / 6;
-          let glowColor = lerpColor(redCol, plumCol, amt * t.glowMix + 0.06);
-          glowColor.setAlpha(208 - g * 23);
-          stroke(glowColor);
-          strokeWeight(15.5 - g * 1.95);
-          noFill();
-          drawTriangle(s);
-        }
-        
-        // Main fill (Turquoise → Purple)
-        let turq = color(64, 224, 208);
-        let purp = color(138, 43, 226);
-        let fillCol = lerpColor(turq, purp, t.colorMix + sin(globalPhase * 0.48) * 0.09);
-        fillCol.setAlpha(192);
-        fill(fillCol);
-        stroke(255, 215, 235, 55);
-        strokeWeight(1.0);
-        drawTriangle(s);
-        
-        // Inner glowing triangles
-        let innerS = s * 0.57;
-        stroke(88, 255, 238, 148);
-        strokeWeight(2.35);
-        noFill();
-        drawTriangle(innerS);
-        
-        stroke(195, 255, 252, 82);
-        strokeWeight(1.25);
-        drawTriangle(innerS * 0.63);
-        
-        stroke(230, 255, 255, 45);
-        strokeWeight(0.65);
-        drawTriangle(innerS * 0.34);
-        
-        pop();
-        
-        t.rot += t.rotSpeed;
-      }
-      
-      // === FLOWING SMALL TRIANGLES (Perlin noise flow field) ===
-      for (let i = flowing.length - 1; i >= 0; i--) {
-        let p = flowing[i];
-        
-        // Perlin noise flow field
-        let noiseScale = 0.0058;
-        let n = noise(p.x * noiseScale, p.y * noiseScale, frameCount * 0.011);
-        let angle = map(n, 0, 1, -PI * 1.6, PI * 1.6);
-        
-        let desiredVx = cos(angle) * 1.35;
-        let desiredVy = sin(angle) * 1.35;
-        
-        // Lerp toward desired flow direction (smooth organic movement)
-        p.vx = lerp(p.vx, desiredVx, 0.085);
-        p.vy = lerp(p.vy, desiredVy, 0.085);
-        
-        p.x += p.vx;
-        p.y += p.vy;
-        
-        p.alpha -= 2.6;
-        p.size *= 0.982;
-        p.rot += p.rotSpeed;
-        
-        if (p.alpha <= 6 || p.size < 5) {
-          flowing.splice(i, 1);
-          continue;
-        }
-        
-        push();
-        translate(p.x, p.y);
-        rotate(p.rot);
-        
-        // Subtle outer glow for flowing triangles
-        stroke(255, 130, 190, p.alpha * 0.55);
-        strokeWeight(2.8);
-        noFill();
-        drawTriangle(p.size);
-        
-        // Fill — slightly more purple bias for subdivision children
-        let baseTurq = color(70, 235, 215);
-        let basePurp = color(155, 85, 235);
-        let c = lerpColor(baseTurq, basePurp, p.colorMix);
-        c.setAlpha(p.alpha);
-        fill(c);
-        stroke(255, 255, 255, p.alpha * 0.32);
-        strokeWeight(0.7);
-        drawTriangle(p.size);
-        
-        pop();
+function drawTriangle(p, s) {
+  let h = s * 0.433;
+  p.triangle(-s*0.5, -h, s*0.5, -h, 0, h*1.15);
+}
+
+// ========== NEW BRANCH: Fluorescent Sway (Pure Triangles + Yellow Outlines) ==========
+let swayTriangles = [];
+
+function setupSway(p) {
+  for (let i = 0; i < 9; i++) {
+    let x = p.map(i, 0, 8, p.width * 0.15, p.width * 0.85);
+    swayTriangles.push({
+      x: x,
+      y: p.random(p.height * 0.25, p.height * 0.55),
+      size: p.random(70, 140),
+      rot: p.random(-0.4, 0.4),
+      rotSpeed: p.random(-0.002, 0.002),
+      velX: 0,
+      velY: 0,
+      phase: p.random(p.TWO_PI),
+      swayAmount: p.random(0.6, 1.3)
+    });
+  }
+}
+
+function drawSway(p) {
+  p.background(8, 4, 18);
+  
+  let windY = 0.08;
+  
+  if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
+    for (let t of swayTriangles) {
+      let d = p.dist(p.mouseX, p.mouseY, t.x, t.y);
+      if (d < 220) {
+        let force = (220 - d) / 220;
+        let angle = p.atan2(t.y - p.mouseY, t.x - p.mouseX);
+        t.velX += p.cos(angle) * force * 0.9;
+        t.velY += p.sin(angle) * force * 0.9;
+        t.rotSpeed += force * 0.004 * (p.mouseX > t.x ? 1 : -1);
       }
     }
-
-    function drawTriangle(s) {
-      let h = s * 0.433;
-      triangle(
-        -s * 0.5, -h,
-         s * 0.5, -h,
-         0,        h * 1.15
-      );
+  }
+  
+  for (let t of swayTriangles) {
+    let noiseX = (p.noise(p.frameCount * 0.008 + t.phase) - 0.5) * 0.6;
+    let noiseY = (p.noise(p.frameCount * 0.007 + t.phase * 1.3) - 0.5) * 0.4;
+    
+    t.velX += noiseX * 0.035;
+    t.velY += noiseY * 0.025 + windY;
+    
+    t.x += t.velX;
+    t.y += t.velY;
+    
+    t.velX *= 0.96;
+    t.velY *= 0.965;
+    t.rotSpeed *= 0.97;
+    
+    t.x = p.lerp(t.x, p.constrain(t.x, p.width * 0.12, p.width * 0.88), 0.012);
+    t.y = p.lerp(t.y, p.constrain(t.y, p.height * 0.2, p.height * 0.7), 0.008);
+    
+    t.rot += t.rotSpeed;
+    
+    p.push();
+    p.translate(t.x, t.y);
+    p.rotate(t.rot + p.sin(p.frameCount * 0.012 + t.phase) * t.swayAmount * 0.3);
+    
+    // Fluorescent yellow glowing outlines (thin layers)
+    for (let g = 0; g < 6; g++) {
+      p.stroke(255, 235, 60, 180 - g * 26);
+      p.strokeWeight(2.8 - g * 0.35);
+      p.noFill();
+      drawSwayTriangle(p, t.size);
     }
+    
+    p.stroke(255, 245, 120);
+    p.strokeWeight(1.6);
+    p.noFill();
+    drawSwayTriangle(p, t.size);
+    
+    p.fill(40, 20, 70, 55);
+    p.noStroke();
+    drawSwayTriangle(p, t.size * 0.92);
+    
+    p.pop();
+  }
+  
+  // Faint hanging lines
+  p.stroke(180, 160, 255, 16);
+  p.strokeWeight(0.7);
+  for (let t of swayTriangles) {
+    p.line(t.x, 38, t.x, t.y - t.size * 0.42);
+  }
+}
 
-    function windowResized() {
-      resizeCanvas(920, 920);
-    }
+function drawSwayTriangle(p, s) {
+  let h = s * 0.48;
+  p.triangle(-s * 0.5, -h, s * 0.5, -h, 0, h * 1.1);
+}
 
-    // Spawn normal flowing triangles + check for subdivision trigger
-    function spawnAt(x, y) {
-      // Normal spawn burst
-      let count = floor(random(8, 14));
-      for (let i = 0; i < count; i++) {
-        flowing.push({
-          x: x + random(-22, 22),
-          y: y + random(-22, 22),
-          vx: random(-1.6, 1.6),
-          vy: random(-2.2, -0.4),
-          size: random(16, 34),
-          rot: random(TWO_PI),
-          rotSpeed: random(-0.07, 0.07),
-          alpha: random(155, 205),
-          colorMix: random(0.2, 0.75)
-        });
-      }
-      
-      // === RECURSIVE SUBDIVISION TRIGGER ===
-      // Find closest main triangle and release child forms if close enough
-      let closest = null;
-      let minDist = 180;
-      
-      for (let t of triangles) {
-        let d = dist(x, y, t.x, t.y);
-        if (d < minDist) {
-          minDist = d;
-          closest = t;
-        }
-      }
-      
-      if (closest) {
-        // Birth 4–6 child triangles from subdivision (they join the flowing system)
-        let subdivCount = floor(random(4, 7));
-        for (let i = 0; i < subdivCount; i++) {
-          let offsetX = random(-28, 28);
-          let offsetY = random(-28, 28);
-          
-          flowing.push({
-            x: closest.x + offsetX,
-            y: closest.y + offsetY,
-            vx: random(-1.2, 1.2) + (offsetX * 0.03),
-            vy: random(-1.8, -0.3) + (offsetY * 0.025),
-            size: random(22, 42),           // slightly larger child forms
-            rot: random(TWO_PI),
-            rotSpeed: random(-0.06, 0.06),
-            alpha: random(145, 195),
-            colorMix: random(0.45, 0.92)     // more purple bias for "children"
-          });
-        }
-        
-        // Give the parent triangle a little energetic pulse
-        closest.rotSpeed *= 2.1;
-      }
-    }
+function mousePressedSway(p) {
+  for (let t of swayTriangles) {
+    let d = p.dist(p.mouseX, p.mouseY, t.x, t.y);
+    let force = p.constrain(180 / (d + 20), 0.8, 3.5);
+    let angle = p.atan2(t.y - p.mouseY, t.x - p.mouseX);
+    t.velX += p.cos(angle) * force * 2.2;
+    t.velY += p.sin(angle) * force * 1.8;
+    t.rotSpeed += p.random(-0.035, 0.035) * force;
+  }
+}
 
-    function mousePressed() {
-      spawnAt(mouseX, mouseY);
-    }
+// ========== INITIALIZE ==========
+let trunkInstance, swayInstance;
 
-    function touchStarted() {
-      if (touches.length > 0) {
-        spawnAt(touches[0].x, touches[0].y);
-      }
-      return false;
-    }
-  </script>
+function setup() {
+  // Trunk canvas
+  trunkInstance = new p5(function(p) {
+    p.setup = function() {
+      p.createCanvas(920, 620);
+      setupTrunk(p);
+    };
+    p.draw = function() {
+      if (currentBranch !== 'trunk') return;
+      drawTrunk(p);
+    };
+    p.mousePressed = function() {
+      if (currentBranch !== 'trunk') return;
+      mousePressedTrunk(p);
+    };
+  }, 'trunk-canvas');
+  
+  // Sway canvas
+  swayInstance = new p5(function(p) {
+    p.setup = function() {
+      p.createCanvas(920, 620);
+      setupSway(p);
+    };
+    p.draw = function() {
+      if (currentBranch !== 'sway') return;
+      drawSway(p);
+    };
+    p.mousePressed = function() {
+      if (currentBranch !== 'sway') return;
+      mousePressedSway(p);
+    };
+  }, 'sway-canvas');
+  
+  currentBranch = 'trunk';
+}
+</script>
+
 </body>
 </html>
